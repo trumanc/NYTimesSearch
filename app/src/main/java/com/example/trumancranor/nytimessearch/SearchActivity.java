@@ -1,5 +1,6 @@
 package com.example.trumancranor.nytimessearch;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -34,6 +36,7 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.gvResults) GridView gvResults;
 
     ArrayList<Article> articles;
+    ArticleArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +45,21 @@ public class SearchActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         articles = new ArrayList<Article>();
+        adapter = new ArticleArrayAdapter(this, articles);
+        gvResults.setAdapter(adapter);
+
+        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
+                Article article = articles.get(position);
+                i.putExtra("article", article);
+                startActivity(i);
+            }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
     }
 
     @Override
@@ -87,7 +93,7 @@ public class SearchActivity extends AppCompatActivity {
         RequestParams params = new RequestParams();
         params.put("api-key", BuildConfig.NYTIMES_API_KEY);
         params.put("page", 0);
-        params.put("query", query);
+        params.put("q", query);
 
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
@@ -98,7 +104,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    articles.addAll(Article.fromJSONArray(articleJsonResults));
+                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.d("ERROR", "Failed to parse the json results", e);
