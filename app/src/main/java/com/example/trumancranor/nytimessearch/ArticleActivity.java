@@ -10,6 +10,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.parceler.Parcels;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -25,7 +27,7 @@ public class ArticleActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
 
-        final Article article = (Article) getIntent().getSerializableExtra("article");
+        final Article article = (Article) Parcels.unwrap(getIntent().getParcelableExtra("article"));
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {

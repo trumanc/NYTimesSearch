@@ -3,15 +3,18 @@ package com.example.trumancranor.nytimessearch;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Article implements Serializable {
-    private String webUrl;
-    private String headline;
-    private String thumbnailUrl;
+
+@Parcel
+public class Article {
+    public String webUrl;
+    public String headline;
+    public String thumbnailUrl;
 
     public String getWebUrl() {
         return webUrl;
@@ -26,6 +29,7 @@ public class Article implements Serializable {
     }
 
 
+    public Article() {/* For parceler library */}
     public Article(JSONObject jsonObject) {
         try {
             this.webUrl = jsonObject.getString("web_url");

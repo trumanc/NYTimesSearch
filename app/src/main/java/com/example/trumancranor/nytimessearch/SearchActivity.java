@@ -2,7 +2,9 @@ package com.example.trumancranor.nytimessearch;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +21,7 @@ import com.loopj.android.http.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,8 +34,8 @@ import cz.msebera.android.httpclient.HttpResponse;
 
 public class SearchActivity extends AppCompatActivity {
 
-    @BindView(R.id.etQuery) EditText etQuery;
-    @BindView(R.id.btnSearch) Button btnSearch;
+    //@BindView(R.id.etQuery) EditText etQuery;
+    //@BindView(R.id.btnSearch) Button btnSearch;
     @BindView(R.id.gvResults) GridView gvResults;
 
     ArrayList<Article> articles;
@@ -53,7 +56,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
                 Article article = articles.get(position);
-                i.putExtra("article", article);
+                i.putExtra("article", Parcels.wrap(article));
                 startActivity(i);
             }
         });
@@ -64,9 +67,24 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                onArticleSearch(searchView.getQuery().toString());
+
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -84,10 +102,7 @@ public class SearchActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onArticleSearch(View view) {
-        String query = etQuery.getText().toString();
-
-        //Toast.makeText(this, "Searching for: " + query, Toast.LENGTH_SHORT).show();
+    public void onArticleSearch(String query) {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
@@ -113,8 +128,8 @@ public class SearchActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("DEBUG", responseString, throwable);
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.d("DEBUG", errorResponse.toString(), throwable);
                 Toast.makeText(SearchActivity.this, "Article request failed. Check the log", Toast.LENGTH_SHORT).show();
             }
         });
