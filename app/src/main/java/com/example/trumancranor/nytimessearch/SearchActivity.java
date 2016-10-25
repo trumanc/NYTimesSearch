@@ -5,19 +5,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,8 +28,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
-import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,19 +38,18 @@ import java.util.TreeSet;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpResponse;
 
 public class SearchActivity extends AppCompatActivity
         implements QueryParamsFragment.OnSaveSettingsListener {
 
     //@BindView(R.id.etQuery) EditText etQuery;
     //@BindView(R.id.btnSearch) Button btnSearch;
-    @BindView(R.id.gvResults) GridView gvResults;
+    @BindView(R.id.rvArticles) RecyclerView rvArticles;
     @BindView(R.id.startDate) TextView tvStartDate;
     @BindView(R.id.endDate) TextView tvEndDate;
 
     private ArrayList<Article> articles;
-    private ArticleArrayAdapter adapter;
+    private ArticleAdapter adapter;
 
     private Calendar startDate;
     private Calendar endDate;
@@ -69,18 +65,9 @@ public class SearchActivity extends AppCompatActivity
 
         params = new QueryParams();
         articles = new ArrayList<Article>();
-        adapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(adapter);
-
-        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(SearchActivity.this, ArticleActivity.class);
-                Article article = articles.get(position);
-                i.putExtra("article", Parcels.wrap(article));
-                startActivity(i);
-            }
-        });
+        adapter = new ArticleAdapter(this, articles);
+        rvArticles.setAdapter(adapter);
+        rvArticles.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
 
         tvStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +179,8 @@ public class SearchActivity extends AppCompatActivity
 
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                    articles.addAll(Article.fromJSONArray(articleJsonResults));
+                    adapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.d("ERROR", "Failed to parse the json results", e);

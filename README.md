@@ -25,7 +25,7 @@ The following **optional** features are implemented:
 * [ ] Improved the user interface and experiment with image assets and/or styling and coloring
 * [X] Replaced Filter Settings Activity with a lightweight modal overlay
 * [ ] Implements robust error handling, [check if internet is available](http://guides.codepath.com/android/Sending-and-Managing-Network-Requests#checking-for-network-connectivity), handle error cases, network failures
-* [ ] Use the [RecyclerView](http://guides.codepath.com/android/Using-the-RecyclerView) with the `StaggeredGridLayoutManager` to display improve the grid of image results
+* [X] Use the [RecyclerView](http://guides.codepath.com/android/Using-the-RecyclerView) with the `StaggeredGridLayoutManager` to display improve the grid of image results
 
 The following **stretch** features are implemented:
 
