@@ -23,3 +23,7 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    supportLibVersion = '24.2.1'
+}

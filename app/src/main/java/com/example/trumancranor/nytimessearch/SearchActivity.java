@@ -1,10 +1,15 @@
 package com.example.trumancranor.nytimessearch;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +44,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
+import static android.support.design.widget.Snackbar.make;
+
 public class SearchActivity extends AppCompatActivity
         implements QueryParamsFragment.OnSaveSettingsListener {
 
@@ -48,13 +55,17 @@ public class SearchActivity extends AppCompatActivity
     @BindView(R.id.startDate) TextView tvStartDate;
     @BindView(R.id.endDate) TextView tvEndDate;
 
+    private SearchView searchView;
     private ArrayList<Article> articles;
     private ArticleAdapter adapter;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     private Calendar startDate;
     private Calendar endDate;
 
     private QueryParams params;
+
+    private Handler apiPacingHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +74,22 @@ public class SearchActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-        params = new QueryParams();
+        apiPacingHandler = new Handler();
+        //params = new QueryParams();
         articles = new ArrayList<Article>();
         adapter = new ArticleAdapter(this, articles);
         rvArticles.setAdapter(adapter);
-        rvArticles.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+        StaggeredGridLayoutManager layoutManager =
+                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        rvArticles.setLayoutManager(layoutManager);
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                loadDataFromPage(page);
+            }
+        };
+
+        rvArticles.addOnScrollListener(scrollListener);
 
         tvStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,12 +121,11 @@ public class SearchActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                onArticleSearch(searchView.getQuery().toString());
-
+                newQuery();
                 searchView.clearFocus();
                 return true;
             }
@@ -133,13 +154,27 @@ public class SearchActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void onArticleSearch(String query) {
-        AsyncHttpClient client = new AsyncHttpClient();
+    //public void onArticleSearch(String query) {
+    public void newQuery() {
+        //refresh everything
+        articles.clear();
+        adapter.notifyDataSetChanged();
+        scrollListener.resetState();
+
+        loadDataFromPage(0);
+    }
+
+    private void loadDataFromPage(final int page) {
+        if (!isNetworkAvailable()) {
+            final Snackbar snackbar = Snackbar.make(rvArticles, "You're offline.", Snackbar.LENGTH_SHORT);
+            snackbar.show();
+            return;
+        }
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", BuildConfig.NYTIMES_API_KEY);
-        params.put("page", 0);
-        params.put("q", query);
+        params.put("page", page);
+        params.put("q", searchView.getQuery().toString());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String sortOrder = prefs.getString(getString(R.string.pref_sort_order_key), "");
@@ -169,7 +204,7 @@ public class SearchActivity extends AppCompatActivity
         if (endDate != null) {
             params.add("end_date", getApiString(endDate));
         }
-
+        AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -190,15 +225,42 @@ public class SearchActivity extends AppCompatActivity
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                onFailure(statusCode, headers, errorResponse.toString(), throwable);
+                onFailure(statusCode, headers, errorResponse == null ? "" : errorResponse.toString(), throwable);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                onFailure(statusCode, headers, errorResponse.toString(), throwable);
+                onFailure(statusCode, headers, errorResponse == null ? "" : errorResponse.toString(), throwable);
             }
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                if (statusCode == 429) {
+                    apiPacingHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadDataFromPage(page);
+                        }
+                    }, 1000); // Delay by a second, since that's the api rate limit
+                } else if (statusCode == 403) {
+                    final Snackbar snackbar = Snackbar.make(rvArticles, "Access forbidden :(", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("okay, I guess", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    snackbar.dismiss();
+                                }
+                            });
+                    snackbar.show();
+                } else if (statusCode == 0) {
+                    final Snackbar snackbar = Snackbar.make(rvArticles, "Network error", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            snackbar.dismiss();
+                            loadDataFromPage(page);
+                        }
+                    });
+                    snackbar.show();
+                }
                 Log.e("API_REQ", "Failed api request. Response: " + responseString, throwable);
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
@@ -235,5 +297,11 @@ public class SearchActivity extends AppCompatActivity
     private static String getApiString(Calendar date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         return format.format(date.getTime());
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 }
