@@ -18,7 +18,7 @@ The following **required** functionality is completed:
 * [X] Subsequent searches have any filters applied to the search results
 * [X] User can tap on any image in results to see the full text of article **full-screen**
 * [X] User can **scroll down to see more articles**. The maximum number of articles is limited by the API search.
-* [ ] User can **share an article link** to their friends or email it to themselves
+* [X] User can **share an article link** to their friends or email it to themselves
 
 The following **optional** features are implemented:
 
@@ -46,9 +46,9 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://g.recordit.co/sIHPF5q2kU.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
-GIF created with [LiceCap](http://www.cockos.com/licecap/).
+GIF created with [RecordIt](http://recordit.co/).
 
 ## Notes
 
