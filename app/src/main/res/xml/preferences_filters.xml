@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="@string/pref_sort_order_key"
+        android:title="@string/pref_sort_order"
+        android:entries="@array/pref_sort_order_entries"
+        android:entryValues="@array/pref_sort_order_values"
+        android:dialogTitle="@string/pref_sort_order"
+    />
+
+    <MultiSelectListPreference
+        android:key="@string/pref_news_desks_key"
+        android:title="@string/pref_news_desks"
+        android:entries="@array/pref_news_desk_entries"
+        android:entryValues="@array/pref_news_desk_values"
+        android:dialogTitle="@string/pref_news_desks" />
+</PreferenceScreen>

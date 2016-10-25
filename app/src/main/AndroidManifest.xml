@@ -25,6 +25,8 @@
             android:label="@string/title_activity_article"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".FilterPreferencesActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sort_order_entries">
+        <item>Most relevant</item>
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
+
+    <string-array name="pref_sort_order_values">
+        <item></item>
+        <item>newest</item>
+        <item>oldest</item>
+    </string-array>
+
+    <string-array name="pref_news_desk_entries">
+        <item>Arts and Leisure</item>
+        <item>Business</item>
+        <item>Culture</item>
+        <item>National</item>
+        <item>Op-Ed</item>
+        <item>Real estate</item>
+        <item>Sports</item>
+        <item>Style</item>
+        <item>Technology</item>
+        <item>Weekend</item>
+        <item>World</item>
+    </string-array>
+
+    <string-array name="pref_news_desk_values">
+        <item>Arts&amp;Leisure</item>
+        <item>Business</item>
+        <item>Culture</item>
+        <item>National</item>
+        <item>OpEd</item>
+        <item>RealEstate</item>
+        <item>Sports</item>
+        <item>Style</item>
+        <item>Technology</item>
+        <item>Weekend</item>
+        <item>World</item>
+    </string-array>
+</resources>

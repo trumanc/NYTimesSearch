@@ -39,14 +39,60 @@
         android:onClick="onArticleSearch"
         />
     -->
-    <GridView
+    <LinearLayout
+        android:id="@+id/date_range_bar"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/btnSearch"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentEnd="true">
+
+        <TextView
+            android:text="Dates: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+
+        <TextView
+            android:id="@+id/startDate"
+            android:hint="Any date"
+            android:textStyle="italic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"
+            />
+
+        <TextView
+            android:text=" - "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+
+        <TextView
+            android:hint="Any date"
+            android:textStyle="italic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/endDate"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+
+
+    </LinearLayout>
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/gvResults"
-        android:numColumns="4"/>
+        android:numColumns="3"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/date_range_bar"
+        android:layout_alignParentStart="true"/>
 </RelativeLayout>

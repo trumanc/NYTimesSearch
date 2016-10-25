@@ -4,4 +4,13 @@
     <string name="hint">Enter search query</string>
     <string name="search">Search</string>
     <string name="title_activity_article">ArticleActivity</string>
+
+    <string name="pref_sort_order_key">sort_order</string>
+    <string name="pref_sort_order">Sort order</string>
+
+    <string name="pref_news_desks_key">news_desks</string>
+    <string name="pref_news_desks">News desks</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
