@@ -1,4 +1,4 @@
-package com.example.trumancranor.nytimessearch;
+package com.example.trumancranor.nytimessearch.detail;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,9 @@ import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.example.trumancranor.nytimessearch.Article;
+import com.example.trumancranor.nytimessearch.R;
 
 import org.parceler.Parcels;
 
@@ -28,7 +31,9 @@ public class ArticleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ButterKnife.bind(this);
 
         article = (Article) Parcels.unwrap(getIntent().getParcelableExtra("article"));

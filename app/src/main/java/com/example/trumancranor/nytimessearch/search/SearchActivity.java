@@ -1,4 +1,4 @@
-package com.example.trumancranor.nytimessearch;
+package com.example.trumancranor.nytimessearch.search;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -20,18 +20,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.trumancranor.nytimessearch.*;
 import com.loopj.android.http.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -111,10 +109,8 @@ public class SearchActivity extends AppCompatActivity
             }
         });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Search NYT");
         setSupportActionBar(toolbar);
-
-
-
     }
 
     @Override
@@ -135,6 +131,8 @@ public class SearchActivity extends AppCompatActivity
                 return false;
             }
         });
+
+        searchView.setQuery("cubs", true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -172,7 +170,7 @@ public class SearchActivity extends AppCompatActivity
         }
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
-        params.put("api-key", BuildConfig.NYTIMES_API_KEY);
+        params.put("api-key", com.example.trumancranor.nytimessearch.BuildConfig.NYTIMES_API_KEY);
         params.put("page", page);
         params.put("q", searchView.getQuery().toString());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

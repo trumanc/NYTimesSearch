@@ -8,12 +8,11 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
         <activity
-            android:name=".SearchActivity"
-            android:label="@string/app_name"
+            android:name=".search.SearchActivity"
+            android:label="Search NYT"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -22,11 +21,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ArticleActivity"
-            android:label="@string/title_activity_article"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".detail.ArticleActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:parentActivityName="com.example.trumancranor.nytimessearch.search.SearchActivity" >
+
         </activity>
-        <activity android:name=".FilterPreferencesActivity">
+        <activity
+            android:name=".FilterPreferencesActivity"
+            android:theme="@style/Theme.AppCompat"
+            android:label="Search settings"
+            android:parentActivityName="com.example.trumancranor.nytimessearch.search.SearchActivity" >
+            >
         </activity>
     </application>
 

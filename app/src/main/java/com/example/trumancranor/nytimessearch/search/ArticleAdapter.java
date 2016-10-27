@@ -1,19 +1,19 @@
-package com.example.trumancranor.nytimessearch;
+package com.example.trumancranor.nytimessearch.search;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.example.trumancranor.nytimessearch.Article;
+import com.example.trumancranor.nytimessearch.detail.ArticleActivity;
+import com.example.trumancranor.nytimessearch.R;
 
 import org.parceler.Parcels;
 
@@ -22,12 +22,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.trumancranor.nytimessearch.R.id.ivImage;
-
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tvTitle) TextView tvTitle;
+
+        @Nullable
         @BindView(R.id. ivImage) ImageView ivImage;
 
         public Article article;
@@ -51,10 +52,20 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     }
 
     @Override
+    public int getItemViewType(int position) {
+        Article a = articles.get(position);
+        if (a.getThumbnailUrl().isEmpty()) {
+            return R.layout.item_article_no_thumbnail;
+        } else {
+            return R.layout.item_article;
+        }
+    }
+
+    @Override
     public ArticleAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        View articleView = inflater.inflate(R.layout.item_article_result, parent, false);
+        View articleView = inflater.inflate(viewType, parent, false);
 
         final ViewHolder viewHolder = new ViewHolder(articleView);
         articleView.setOnClickListener(new View.OnClickListener() {
@@ -75,10 +86,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
         holder.tvTitle.setText(holder.article.getHeadline());
 
-        holder.ivImage.setImageResource(0);
-        String thumbnail = holder.article.getThumbnailUrl();
-        if (!thumbnail.isEmpty()) {
-            Picasso.with(getContext()).load(thumbnail).into(holder.ivImage);
+        if (holder.ivImage != null) {
+            holder.ivImage.setImageResource(0);
+            String thumbnail = holder.article.getThumbnailUrl();
+            if (!thumbnail.isEmpty()) {
+                Glide.with(getContext()).load(thumbnail).into(holder.ivImage);
+            }
         }
     }
 

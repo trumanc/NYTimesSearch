@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.trumancranor.nytimessearch.SearchActivity">
+    tools:context="com.example.trumancranor.nytimessearch.search.SearchActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -66,13 +66,6 @@
 
 
         </LinearLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
     </android.support.design.widget.AppBarLayout>
 
