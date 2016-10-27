@@ -44,11 +44,7 @@ import cz.msebera.android.httpclient.Header;
 
 import static android.support.design.widget.Snackbar.make;
 
-public class SearchActivity extends AppCompatActivity
-        implements QueryParamsFragment.OnSaveSettingsListener {
-
-    //@BindView(R.id.etQuery) EditText etQuery;
-    //@BindView(R.id.btnSearch) Button btnSearch;
+public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.rvArticles) RecyclerView rvArticles;
     @BindView(R.id.startDate) TextView tvStartDate;
     @BindView(R.id.endDate) TextView tvEndDate;
@@ -60,8 +56,6 @@ public class SearchActivity extends AppCompatActivity
 
     private Calendar startDate;
     private Calendar endDate;
-
-    private QueryParams params;
 
     private Handler apiPacingHandler;
 
