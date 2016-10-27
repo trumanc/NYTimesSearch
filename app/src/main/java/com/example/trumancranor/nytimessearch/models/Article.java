@@ -1,4 +1,4 @@
-package com.example.trumancranor.nytimessearch;
+package com.example.trumancranor.nytimessearch.models;
 
 import org.json.JSONArray;
 import org.json.JSONException;

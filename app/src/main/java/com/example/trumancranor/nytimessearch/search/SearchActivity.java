@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
@@ -25,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trumancranor.nytimessearch.*;
+import com.example.trumancranor.nytimessearch.filter_preferences.FilterPreferencesActivity;
+import com.example.trumancranor.nytimessearch.models.Article;
 import com.loopj.android.http.*;
 
 import org.json.JSONArray;
@@ -48,6 +51,7 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.rvArticles) RecyclerView rvArticles;
     @BindView(R.id.startDate) TextView tvStartDate;
     @BindView(R.id.endDate) TextView tvEndDate;
+    @BindView(R.id.loading_footer) View loadingFooter;
 
     private SearchView searchView;
     private ArrayList<Article> articles;
@@ -67,7 +71,6 @@ public class SearchActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         apiPacingHandler = new Handler();
-        //params = new QueryParams();
         articles = new ArrayList<Article>();
         adapter = new ArticleAdapter(this, articles);
         rvArticles.setAdapter(adapter);
@@ -130,6 +133,14 @@ public class SearchActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    private void showSpinner() {
+        loadingFooter.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSpinner() {
+        loadingFooter.setVisibility(View.INVISIBLE);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -157,12 +168,64 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void loadDataFromPage(final int page) {
+
         if (!isNetworkAvailable()) {
             final Snackbar snackbar = Snackbar.make(rvArticles, "You're offline.", Snackbar.LENGTH_SHORT);
             snackbar.show();
             return;
         }
-        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+        final String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+        final RequestParams params = compileParameters(page) ;
+
+        showSpinner();
+
+        apiPacingHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                sendApiRequest(url, params);
+                // Put this handler to sleep for half a second before finishing this request.
+                // That way only api calls are slowed by this, which serves to avoid api limit errors.
+                SystemClock.sleep(500);
+            }
+        });
+
+    }
+
+    private void showDatePickerPickerDialog(final TextView textView, final Calendar date) {
+        DatePickerDialog dialog = new DatePickerDialog(this);
+
+        dialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                date.set(year, month, dayOfMonth);
+                textView.setText(humanReadableString(date));
+            }
+        });
+        dialog.show();
+    }
+
+    private void showFilterPreferencesFragment() {
+        Intent i = new Intent(this, FilterPreferencesActivity.class);
+        startActivity(i);
+    }
+
+    private static String humanReadableString(Calendar date) {
+        SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy");
+        return format.format(date.getTime());
+    }
+
+    private static String getApiString(Calendar date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        return format.format(date.getTime());
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    private RequestParams compileParameters(int page) {
         RequestParams params = new RequestParams();
         params.put("api-key", com.example.trumancranor.nytimessearch.BuildConfig.NYTIMES_API_KEY);
         params.put("page", page);
@@ -196,6 +259,10 @@ public class SearchActivity extends AppCompatActivity {
         if (endDate != null) {
             params.add("end_date", getApiString(endDate));
         }
+        return params;
+    }
+
+    private void sendApiRequest(final String url, final RequestParams params) {
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
@@ -208,9 +275,16 @@ public class SearchActivity extends AppCompatActivity {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                     articles.addAll(Article.fromJSONArray(articleJsonResults));
                     adapter.notifyDataSetChanged();
+                    //After a couple seconds for the recycler view to re-render articles, hide the spinner
+                    apiPacingHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideSpinner();
+                        }
+                    }, 2000);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.d("ERROR", "Failed to parse the json results", e);
+                    Log.e("API_ERROR", "Failed to parse the json results", e);
                     Toast.makeText(SearchActivity.this, "Failed to parse Json results. Check the log.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -227,20 +301,22 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 if (statusCode == 429) {
-                    apiPacingHandler.postDelayed(new Runnable() {
+                    apiPacingHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            loadDataFromPage(page);
+                            sendApiRequest(url, params);
+                            // If we're hitting the api limit, increase the sleep time
+                            SystemClock.sleep(1000);
                         }
-                    }, 1000); // Delay by a second, since that's the api rate limit
+                    }); // Delay by a second, since that's the api rate limit
                 } else if (statusCode == 403) {
                     final Snackbar snackbar = Snackbar.make(rvArticles, "Access forbidden :(", Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction("okay, I guess", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    snackbar.dismiss();
-                                }
-                            });
+                        @Override
+                        public void onClick(View v) {
+                            snackbar.dismiss();
+                        }
+                    });
                     snackbar.show();
                 } else if (statusCode == 0) {
                     final Snackbar snackbar = Snackbar.make(rvArticles, "Network error", Snackbar.LENGTH_INDEFINITE);
@@ -248,52 +324,19 @@ public class SearchActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             snackbar.dismiss();
-                            loadDataFromPage(page);
+                            apiPacingHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sendApiRequest(url, params);
+                                }
+                            }); // Delay by a second, since that's the api rate limit
                         }
                     });
                     snackbar.show();
                 }
-                Log.e("API_REQ", "Failed api request. Response: " + responseString, throwable);
-                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.e("API_ERROR", "Failed api request. Response: " + responseString, throwable);
             }
 
         });
-    }
-
-    private void showDatePickerPickerDialog(final TextView textView, final Calendar date) {
-        DatePickerDialog dialog = new DatePickerDialog(this);
-
-        dialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                date.set(year, month, dayOfMonth);
-                textView.setText(humanReadableString(date));
-            }
-        });
-        dialog.show();
-    }
-
-    private void showFilterPreferencesFragment() {
-        Intent i = new Intent(this, FilterPreferencesActivity.class);
-        startActivity(i);
-        /*FragmentManager fm = getSupportFragmentManager();
-        FilterPreferencesFragment f = new FilterPreferencesFragment();
-        f.show(fm, "filter_prefs_frag"); */
-    }
-
-    private static String humanReadableString(Calendar date) {
-        SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy");
-        return format.format(date.getTime());
-    }
-
-    private static String getApiString(Calendar date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        return format.format(date.getTime());
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 }

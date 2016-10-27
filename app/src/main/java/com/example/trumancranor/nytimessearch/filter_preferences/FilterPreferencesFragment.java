@@ -1,4 +1,4 @@
-package com.example.trumancranor.nytimessearch;
+package com.example.trumancranor.nytimessearch.filter_preferences;
 
 
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.trumancranor.nytimessearch.R;
 
 /**
  * A simple {@link Fragment} subclass.

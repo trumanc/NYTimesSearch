@@ -27,7 +27,7 @@
 
         </activity>
         <activity
-            android:name=".FilterPreferencesActivity"
+            android:name=".filter_preferences.FilterPreferencesActivity"
             android:theme="@style/Theme.AppCompat"
             android:label="Search settings"
             android:parentActivityName="com.example.trumancranor.nytimessearch.search.SearchActivity" >

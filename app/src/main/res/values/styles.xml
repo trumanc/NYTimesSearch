@@ -23,6 +23,12 @@
     <style name="headline_no_thumbnail" parent="AppTheme">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
         <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="loading_footer" parent="AppTheme">
+        <item name="android:background">@android:color/darker_gray</item>
+        <item name="android:gravity">center</item>
+        <item name="android:visibility">invisible</item>
 
     </style>
 

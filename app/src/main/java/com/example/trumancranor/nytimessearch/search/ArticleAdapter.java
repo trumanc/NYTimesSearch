@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.trumancranor.nytimessearch.Article;
+import com.example.trumancranor.nytimessearch.models.Article;
 import com.example.trumancranor.nytimessearch.detail.ArticleActivity;
 import com.example.trumancranor.nytimessearch.R;
 

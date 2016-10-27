@@ -1,4 +1,4 @@
-package com.example.trumancranor.nytimessearch;
+package com.example.trumancranor.nytimessearch.filter_preferences;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

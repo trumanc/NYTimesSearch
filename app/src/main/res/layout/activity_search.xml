@@ -1,74 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.trumancranor.nytimessearch.search.SearchActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.design.widget.AppBarLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        tools:context="com.example.trumancranor.nytimessearch.search.SearchActivity">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways">
+            android:layout_height="wrap_content">
 
-        </android.support.v7.widget.Toolbar>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|enterAlways">
 
-        <LinearLayout
-            android:id="@+id/date_range_bar"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+            </android.support.v7.widget.Toolbar>
+
+            <LinearLayout
+                android:id="@+id/date_range_bar"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                app:layout_scrollFlags="scroll|enterAlways">
+
+                <TextView
+                    android:text="Dates: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+
+                <TextView
+                    android:id="@+id/startDate"
+                    android:hint="Any date"
+                    android:textStyle="italic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"
+                    />
+
+                <TextView
+                    android:text=" - "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+
+                <TextView
+                    android:hint="Any date"
+                    android:textStyle="italic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/endDate"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+
+
+            </LinearLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <include layout="@layout/content_search"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+    <LinearLayout
+        android:id="@+id/loading_footer"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/loading_footer">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            app:layout_scrollFlags="scroll|enterAlways">
+            />
+    </LinearLayout>
 
-            <TextView
-                android:text="Dates: "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@android:style/TextAppearance.Material.Large"/>
-
-            <TextView
-                android:id="@+id/startDate"
-                android:hint="Any date"
-                android:textStyle="italic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:textAppearance="@android:style/TextAppearance.Material.Large"
-                />
-
-            <TextView
-                android:text=" - "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@android:style/TextAppearance.Material.Large"/>
-
-            <TextView
-                android:hint="Any date"
-                android:textStyle="italic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/endDate"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:textAppearance="@android:style/TextAppearance.Material.Large"/>
-
-
-        </LinearLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_search"/>
-
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>
