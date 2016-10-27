@@ -2,7 +2,7 @@
 
 **NYTimesSearch** is an android app that allows a user to search for articles on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
-Time spent: **X** hours spent in total
+Time spent: **20** hours spent in total
 
 ## User Stories
 
@@ -41,12 +41,27 @@ The following **stretch** features are implemented:
 The following **additional** features are implemented:
 
 * [X] Persisted 'News desk' and 'Sort order' settings using SharedPreferences
+* [X] Added a loading bar spinner that shows at the bottom of the screen when api data is being fetched/rendered
+* [X] Changed the launcher icon
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
+**General Searching**
 
-<img src='http://g.recordit.co/sIHPF5q2kU.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://g.recordit.co/qwJTnCAhPi.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+
+**Sharing an article**
+
+<img src='http://g.recordit.co/TgWqhQeWMF.gif' title='Video Walkthrough' width='' alt='Sharing an article' />
+
+
+**Error handling**
+
+<img src='http://g.recordit.co/jZboqsq8d1.gif' title='Video Walkthrough' width='' alt='Network errors' />
+
+(The NYTimes api will return a 403 when the response contains some old articles for some reason. I trigger it by sorting the articles by oldest first)
 
 GIF created with [RecordIt](http://recordit.co/).
 

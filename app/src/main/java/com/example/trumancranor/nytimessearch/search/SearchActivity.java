@@ -129,7 +129,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        searchView.setQuery("cubs", true);
+        searchView.setQuery("", true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -311,6 +311,7 @@ public class SearchActivity extends AppCompatActivity {
                     }); // Delay by a second, since that's the api rate limit
                 } else if (statusCode == 403) {
                     final Snackbar snackbar = Snackbar.make(rvArticles, "Access forbidden :(", Snackbar.LENGTH_INDEFINITE);
+                    hideSpinner();
                     snackbar.setAction("okay, I guess", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
